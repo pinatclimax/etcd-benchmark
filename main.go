@@ -3,8 +3,15 @@ package main
 import (
 	"errors"
 	"fmt"
+	"runtime"
 
 	"sync"
+
+	"time"
+
+	"os"
+
+	"strconv"
 
 	"climax.com/mqtt.sa/etcd"
 )
@@ -16,13 +23,32 @@ var ffffffNum = 16777215
 
 func main() {
 
+	runtime.GOMAXPROCS(4)
+
+	testLimit, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	var wg sync.WaitGroup
-	wg.Add(100000)
-	for i := 1; i <= 100000; i++ {
-		go writePanelMac(i, &wg)
+	wg.Add(testLimit)
+	for i := 1; i <= testLimit; i++ {
+		go readPanelMac(i, &wg)
+		time.Sleep(1000)
 	}
 
 	wg.Wait()
+}
+
+func readPanelMac(num int, wg *sync.WaitGroup) {
+	mac, err := numberToMac(num)
+	etcd.Select("/mqtt/panel/" + mac)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	wg.Done()
 }
 
 func writePanelMac(num int, wg *sync.WaitGroup) {
@@ -42,5 +68,6 @@ func numberToMac(num int) (string, error) {
 	}
 	hexnum := fmt.Sprintf("%06x", num)
 	postmac := fmt.Sprintf("%s:%s:%s", hexnum[0:2], hexnum[2:4], hexnum[4:6])
+	fmt.Println(num, "11:11:11:"+postmac)
 	return "11:11:11:" + postmac, nil
 }
