@@ -12,8 +12,8 @@ import (
 	"os"
 
 	"strconv"
+	"climax.com/etcd-benchmark/etcd"
 
-	"climax.com/mqtt.sa/etcd"
 )
 
 var macPrefix = "11:11:11:"
@@ -30,11 +30,24 @@ func main() {
 		fmt.Println(err)
 	}
 
+	etcdOper := os.Args[2]
+	
 	var wg sync.WaitGroup
 	wg.Add(testLimit)
 	for i := 1; i <= testLimit; i++ {
-		go readPanelMac(i, &wg)
 		time.Sleep(1000)
+		switch etcdOper {
+			case "select":
+			readPanelMac(i, &wg)
+			
+			case "upsert":
+			writePanelMac(i, &wg)
+
+			default:
+			readPanelMac(i, &wg)
+
+		}
+		
 	}
 
 	wg.Wait()

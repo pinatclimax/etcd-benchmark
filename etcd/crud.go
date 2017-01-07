@@ -11,8 +11,8 @@ import (
 //Select pass the key and get value or values
 func Select(key string) clientv3.GetResponse {
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"10.0.1.11:2379"},
-		DialTimeout: 5 * time.Second,
+		Endpoints:   []string{"10.15.8.160:2379", "10.15.8.167:2379", "10.15.8.171:2379"},
+		DialTimeout: 3600 * time.Second,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -34,8 +34,8 @@ func Select(key string) clientv3.GetResponse {
 //Upsert represents insert or update
 func Upsert(key string, value string) {
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"10.0.1.11:2379", "10.0.1.12:2379"},
-		DialTimeout: 5 * time.Second,
+		Endpoints:   []string{"10.15.8.160:2379", "10.15.8.167:2379", "10.15.8.171:2379"},
+		DialTimeout: 3600 * time.Second,
 	})
 	if err != nil {
 		log.Fatal(err)
